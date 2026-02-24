@@ -56,12 +56,22 @@ public class mainFrame extends javax.swing.JFrame {
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setText("Προβολή αποθηκευμένων άρθρων ");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem2);
 
         jMenuItem3.setText("Τροποποίηση στοιχείων άρθρου ");
         jMenu1.add(jMenuItem3);
 
         jMenuItem4.setText("Προβολή στατιστικών");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem4);
 
         jMenuItem5.setText("Έξοδος");
@@ -102,6 +112,7 @@ public class mainFrame extends javax.swing.JFrame {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
         NewJFrame n1 = new NewJFrame();
+        n1.setTitle("Αναζήτηση άρθρου");
         n1.setLocationRelativeTo(null);
         n1.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
@@ -117,6 +128,22 @@ public class mainFrame extends javax.swing.JFrame {
             System.exit(0);
         }
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        SavedFrame viewFrame = new SavedFrame();
+        viewFrame.setTitle("Προβολή αποθηκευμένων άρθρων ");
+        viewFrame.setLocationRelativeTo(null); 
+        viewFrame.setVisible(true);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        statisticsFrame n2 = new statisticsFrame();
+        n2.setTitle("Προβολή Στατιστικών");
+        n2.setLocationRelativeTo(null);
+        n2.setVisible(true);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     /**
      * @param args the command line arguments

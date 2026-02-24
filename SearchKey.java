@@ -61,6 +61,10 @@ public class SearchKey implements Serializable {
     public void setSearchCount(int searchCount) {
         this.searchCount = searchCount;
     }
+    
+    public void addSearch(){
+        this.searchCount = this.searchCount + 1;
+    } 
 
     @Override
     public int hashCode() {

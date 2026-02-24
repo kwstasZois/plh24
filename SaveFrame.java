@@ -28,19 +28,55 @@ public class SaveFrame extends javax.swing.JFrame {
     CategoryJpaController controllerL = new CategoryJpaController(emf);
     SearchKeyJpaController controllerM = new SearchKeyJpaController(emf);
     
-    public SaveFrame(String title, String timestamp, String pageId, String snippet) {
+    public SaveFrame(String title, String timestamp, String pageId, String snippet, String comments) {
         initComponents(); // Απαραίτητο για να φτιαχτούν τα γραφικά
         
         // Ορίζουμε τον τίτλο στο TextField 
         jTextField4.setText(title);
-        
-        
-         jTextField2.setText(pageId);
+        jTextPane1.setText(comments);
+         jTextField1.setText(pageId);
          jTextField3.setText(timestamp);
-         
          jTextArea1.setText(snippet);
          jTextArea1.setLineWrap(true);
          jTextArea1.setWrapStyleWord(true);
+      
+         
+         try {
+             //Μετατροπή timestamp στην μορφή dd/MM/yyyy
+             java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+             java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+             java.util.Date date = inputFormat.parse(timestamp);
+             String formattedDate = outputFormat.format(date);
+             jTextField3.setText(formattedDate);
+             
+             
+            int id = Integer.parseInt(pageId);
+            // Ψάχνουμε αν το άρθρο υπάρχει ήδη στη βάση μας
+            Article existingArticle = controllerK.findArticle(id);
+            
+            if (existingArticle != null) {
+            // Αν το άρθρο υπάρχει, φορτώνουμε τα "εμπλουτισμένα" δεδομένα
+            
+            
+            // Φόρτωση Σχολίων 
+            if (existingArticle.getComments() != null) {
+                jTextPane1.setText(existingArticle.getComments());
+            }
+            
+            // Φόρτωση Βαθμολογίας 
+            if (existingArticle.getRate() != null) {
+                jComboBox2.setSelectedItem(existingArticle.getRate().toString());
+            }
+            
+            // Φόρτωση Κατηγορίας 
+            if (existingArticle.getCategory() != null) {
+                jComboBox1.setSelectedItem(existingArticle.getCategory().getId());
+            }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Σφάλμα: " + ex.getMessage());
+            ex.printStackTrace();
+        }
         
         // Δεν κλείνει όλο το παράθυρο της εφαρμογής
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -61,7 +97,6 @@ public class SaveFrame extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jTextField4 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -75,6 +110,7 @@ public class SaveFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(880, 600));
@@ -94,6 +130,7 @@ public class SaveFrame extends javax.swing.JFrame {
 
         jLabel4.setText("Τίτλος:");
 
+        jTextField4.setEditable(false);
         jTextField4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField4ActionPerformed(evt);
@@ -104,9 +141,11 @@ public class SaveFrame extends javax.swing.JFrame {
 
         jLabel6.setText("Timestamp:");
 
+        jTextField3.setEditable(false);
+
         jLabel3.setText("Βαθμολογία:");
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "1", "2", "3", "4", "5" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5" }));
 
         jLabel2.setText("Κατηγορία:");
 
@@ -123,6 +162,7 @@ public class SaveFrame extends javax.swing.JFrame {
 
         jLabel7.setText("Περιγραφή:");
 
+        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane2.setViewportView(jTextArea1);
@@ -134,6 +174,13 @@ public class SaveFrame extends javax.swing.JFrame {
             }
         });
 
+        jTextField1.setEditable(false);
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -141,12 +188,6 @@ public class SaveFrame extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(17, 17, 17)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(89, 89, 89)
-                        .addComponent(jLabel7))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(52, 52, 52)
@@ -165,9 +206,15 @@ public class SaveFrame extends javax.swing.JFrame {
                             .addComponent(jLabel5)
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(31, 31, 31)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jTextField1)
+                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(17, 17, 17)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(89, 89, 89)
+                        .addComponent(jLabel7)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -190,9 +237,9 @@ public class SaveFrame extends javax.swing.JFrame {
                                     .addComponent(jTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel5))))
-                        .addGap(31, 31, 31)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(29, 29, 29)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
                             .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -263,7 +310,7 @@ public class SaveFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         try{
             String title = jTextField4.getText();
-            Integer pageid = Integer.parseInt(jTextField2.getText());
+            Integer pageid = Integer.parseInt(jTextField1.getText());
             String timestamp = jTextField3.getText();
             String snippet = jTextArea1.getText();
             String comments = jTextPane1.getText();
@@ -275,12 +322,12 @@ public class SaveFrame extends javax.swing.JFrame {
             
             
             //Ελέγχουμε αν είναι η παύλα
-            if (rateString.equals("-")){
-                rate = null;//Αν είναι παύλα το rate γίνεται null
-            }else{
+            //if (rateString.equals("-")){
+              //  rate = null;//Αν είναι παύλα το rate γίνεται null
+            //}else{
                 //Μόνο αν δεν είναι παύλα προσπαθούμε να το κάνουμε αριθμό
-                rate = Integer.parseInt(rateString);
-            }
+               rate = Integer.parseInt(rateString);
+            //}
           
             //Έλεγχος αν υπάρχει ήδη
             Article existing = controllerK.findArticle(pageid);
@@ -317,6 +364,10 @@ public class SaveFrame extends javax.swing.JFrame {
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -370,7 +421,7 @@ public class SaveFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextPane jTextPane1;

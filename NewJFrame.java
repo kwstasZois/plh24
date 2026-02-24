@@ -13,6 +13,9 @@ import com.google.gson.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import okhttp3.OkHttpClient;
@@ -33,7 +36,9 @@ public class NewJFrame extends javax.swing.JFrame {
     public NewJFrame() {
         initComponents();
     }
-
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("projectPU");
+    EntityManager em = emf.createEntityManager();
+    SearchKeyJpaController controllerM = new SearchKeyJpaController(emf);
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -154,22 +159,38 @@ public class NewJFrame extends javax.swing.JFrame {
         javax.swing.JOptionPane.showMessageDialog(this, "Παρακαλώ δώστε μια λέξη!");
         return; 
     }
+    
+    
+    SearchKey searchKey = controllerM.findSearchKey(keyword);
+    
+    try{
+        if (searchKey == null){
+            SearchKey key = new SearchKey(keyword, 1);
+            controllerM.create(key);
+        }else{
+            searchKey.addSearch();
+            controllerM.edit(searchKey);
+        }
+    }
+    catch(Exception e){
+        e.getMessage();
+    }
 
-    // 2. Προετοιμασία OkHttpClient
+    //  Προετοιμασία OkHttpClient
     okhttp3.OkHttpClient client = new okhttp3.OkHttpClient();
     
     try {
         // Σωστό Encoding για τα Ελληνικά
-        String encodedSearch = java.net.URLEncoder.encode(keyword, java.nio.charset.StandardCharsets.UTF_8.toString());
-        String url = "https://el.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch=" + encodedSearch;
+        //String encodedSearch = java.net.URLEncoder.encode(keyword, java.nio.charset.StandardCharsets.UTF_8.toString());
+        String url = "https://el.wikipedia.org/w/api.php?action=query&list=search&srsearch="+ keyword +"&format=json" ;
 
-        // 3. Κατασκευή του Request
+        //  Κατασκευή του Request
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(url)
                 .header("User-Agent", "WikiViewer/1.0 (student-project@eap.gr)")
                 .build();
 
-        // 4. Εκτέλεση της κλήσης
+        //  Εκτέλεση της κλήσης
        try (okhttp3.Response response = client.newCall(request).execute()) {
         if (response.isSuccessful() && response.body() != null) {
             String responseString = response.body().string();
@@ -270,7 +291,8 @@ public class NewJFrame extends javax.swing.JFrame {
         selectedArt.getTitle(), 
         selectedArt.getTimestamp(), 
         String.valueOf(selectedArt.getPageid()), 
-        selectedArt.getSnippet()
+        selectedArt.getSnippet(),
+        selectedArt.getComments()
     );
     // Άνοιγμα του SaveFrame με τα δεδομένα
     //SaveFrame saveFrame = new SaveFrame(title, timestamp, pageId, snippet);
